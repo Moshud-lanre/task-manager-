@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { default: validator } = require("validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -34,22 +35,43 @@ const userSchema = new mongoose.Schema({
                 throw new Error("Age must be a positive number!");
             }
         }
-    }
+    },
+    token: [{
+        
+            token: {
+                type: String,
+                required: true
+            }
+        
+    }]
 });
 
+userSchema.methods.generateAuthToken = async function (){
+    const user = this;
+
+    const token = jwt.sign({_id: user._id.toString()}, "thesecretword");
+
+    user.token = user.token.concat({token});
+
+    await user.save()
+
+    return token;
+}
+
 userSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email });
 
     if(!user){
         throw new Error("Unable to login");
     }
     
-    const isMatch = bcrypt.compare(password, user.password);
+    const isMatch =  await bcrypt.compare(password, user.password);
 
-    if(!isMatch){
+        if(!isMatch){
         throw new Error("Unable to login");
-    }
-    return user;
+        } 
+        return user;
+    
 }
 // Middleware that hash password (the 'pre' is used for actions before and 'post' for after, 'save' is a type of action carried out)
 userSchema.pre("save",  async function (next){ 
