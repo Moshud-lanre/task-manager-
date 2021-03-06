@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         trim: true,
+        unique: true,
         lowercase: true,
         validate(value){
             if(!validator.isEmail(value)) throw new Error("Email is invalid")
@@ -35,7 +36,22 @@ const userSchema = new mongoose.Schema({
         }
     }
 });
-// Middleware that activate bcrypt (the 'pre' is used for actions before and 'post' for after, 'save' is a type of action carried out)
+
+userSchema.statics.findByCredentials = async (email, password) => {
+    const user = await User.findOne({email});
+
+    if(!user){
+        throw new Error("Unable to login");
+    }
+    
+    const isMatch = bcrypt.compare(password, user.password);
+
+    if(!isMatch){
+        throw new Error("Unable to login");
+    }
+    return user;
+}
+// Middleware that hash password (the 'pre' is used for actions before and 'post' for after, 'save' is a type of action carried out)
 userSchema.pre("save",  async function (next){ 
     const user = this;
 
