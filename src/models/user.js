@@ -45,6 +45,13 @@ const userSchema = new mongoose.Schema({
         
     }]
 });
+//virtual property
+userSchema.virtual("tasks", {
+    localField: "_id",
+    foreignField: "author",
+    ref: "Task"
+});
+
 // modifying info being displayed
 userSchema.methods.toJSON = function () {
     const user = this;
