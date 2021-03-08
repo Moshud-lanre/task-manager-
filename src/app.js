@@ -6,6 +6,11 @@ const taskRouter = require("../src/routes/task");
 const app = express();
 const port = process.env.PORT || 3000;
 
+// //middleware for auth
+// app.use((req, res, next) => {
+//     res.status(503).send("Site under maintenance.");
+// });
+
 app.use(express.json()); 
 app.use(userRouter);
 app.use(taskRouter);

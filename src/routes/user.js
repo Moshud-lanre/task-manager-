@@ -1,5 +1,6 @@
 const express = require("express");
 const User = require("../models/user");
+const auth = require("../middlware/auth");
 const router = new express.Router();
 
 router
@@ -24,17 +25,43 @@ router
         res.status(400).send(e.message);
     }
 })
-//read users
-.get("/users", async (req, res) => {
+
+.post("/users/logout", auth, async (req, res) => {
     try {
-       const users = await User.find({});
-        if(users.length === 0){
-        return res.status(200).send("Empty collection ");
-        }
-        res.status(200).send(users);
-    } catch (error) {
+        req.user.tokens = req.user.tokens.filter((tok) => tok.token !== req.authtoken);
+
+        await req.user.save();
+
+        res.send("Successfully logged out");
+    } catch (e) {
         res.status(500).send();
     }
+})
+
+.post("/users/logoutAll", auth, async (req, res) => {
+    try {
+        req.user.tokens = [];
+
+        await req.user.save();
+
+        res.send("Successfully logged out of all sessions.");
+    } catch (e) {
+        res.status(500).send();
+    }
+})
+//read user profile
+.get("/users/me", auth, async (req, res) => {
+    res.send(req.user);
+
+    // try {
+    //    const users = await User.find({});
+    //     if(users.length === 0){
+    //     return res.status(200).send("Empty collection ");
+    //     }
+    //     res.status(200).send(users);
+    // } catch (error) {
+    //     res.status(500).send();
+    // }
 
 })
 //get specific user

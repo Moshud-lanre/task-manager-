@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
-    token: [{
+    tokens: [{
         
             token: {
                 type: String,
@@ -45,13 +45,24 @@ const userSchema = new mongoose.Schema({
         
     }]
 });
+// modifying info being displayed
+userSchema.methods.toJSON = function () {
+    const user = this;
+    const userObject = user.toObject();
 
+    delete userObject.password;
+    delete userObject.tokens;
+
+    return userObject;
+}
+
+//generate token
 userSchema.methods.generateAuthToken = async function (){
     const user = this;
 
     const token = jwt.sign({_id: user._id.toString()}, "thesecretword");
 
-    user.token = user.token.concat({token});
+    user.tokens = user.tokens.concat({token});
 
     await user.save()
 
