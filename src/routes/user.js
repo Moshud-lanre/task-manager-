@@ -64,20 +64,9 @@ router
     // }
 
 })
-//get specific user
-.get("/users/:id", async (req, res) => {
-    const _id = req.params.id;
 
-    try {
-        const user = await User.findById(_id);
-        if (!user) return res.status(404).send("No user matches, try another id ");
-        res.send(user);
-    } catch (error) {
-        res.status(500).send(error)
-    }
-})
-//update a user
-.patch("/users/:id", async (req,res) => {
+//update profile
+.patch("/users/me", auth, async (req,res) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ["name", "email", "age", "password"];
     const isAllowed = updates.every((update) => allowedUpdates.includes(update));
@@ -87,28 +76,26 @@ router
     }
 
     try {
-        const user = await User.findById(req.params.id);
+        // const user = await User.findById(req.params.id);
 
-        updates.forEach((update) => user[update] = req.body[update]); //used cos of middleware
+        updates.forEach((update) => req.user[update] = req.body[update]); //used cos of middleware
         //const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
         
-        await user.save();
+        await req.user.save();
         
-        if(!user){return res.status(404).send({"error": "User not Found"})};
-        res.send(user);
+        // if(!user){return res.status(404).send({"error": "User not Found"})};
+        res.send(req.user);
         
     } catch (e) {
         res.status(400).send(e);
     }
 })
 
-.delete("/users/:id", async (req, res) => {
+.delete("/users/me", auth, async (req, res) => {
     try {
-        const user =  await User.findByIdAndDelete(req.params.id);
-        if(!user){
-            return res.status(404).send({error: "User not found"});
-        }
-        res.send(user);
+        await req.user.remove();
+        
+        res.send(req.user);
     } catch (e) {
         res.status(500).send(e);
     }
