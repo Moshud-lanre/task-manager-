@@ -11,8 +11,9 @@ router
     try {
         await user.save();
         const token = await user.generateAuthToken();
-        res.cookie("auth_token", token);
-        res.sendFile(path.resolve(__dirname, "..", "views", "private.html"));
+        //res.cookie("auth_token", token);
+        res.status(201).send({ user, token});
+        //res.sendFile(path.resolve(__dirname, "..", "views", "private.html"));
     } catch (error) {
         res.status(400).send(error)
     }
@@ -22,8 +23,9 @@ router
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password);
         const token = await user.generateAuthToken();
-        res.cookie("auth_token", token);
-        res.sendFile(path.resolve(__dirname, "..", "views", "private.html"));
+        //res.cookie("auth_token", token);
+        res.send({user, token});
+       // res.sendFile(path.resolve(__dirname, "..", "views", "private.html"));
     } catch (e) {
         res.status(400).send(e.message);
     }
@@ -97,7 +99,6 @@ router
 .delete("/users/me", auth, async (req, res) => {
     try {
         await req.user.remove();
-        
         res.send(req.user);
     } catch (e) {
         res.status(500).send(e);

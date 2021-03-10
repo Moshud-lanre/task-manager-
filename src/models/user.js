@@ -108,7 +108,7 @@ userSchema.pre("save",  async function (next){
 userSchema.pre("remove", async function (next) {
     const user = this;
 
-    Task.deleteMany({_id: user._id});
+    await Task.deleteMany({author: user._id});
 
     next();
 });
