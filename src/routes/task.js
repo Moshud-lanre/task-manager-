@@ -30,7 +30,11 @@ router
        //const tasks = await Task.find({author: req.user._id});
        await req.user.populate({
            path: "tasks",
-           match
+           match,
+           options: {
+               limit: Number(req.query.limit),
+               skip: parseInt(req.query.skip)
+           }
        }).execPopulate(); //method 2
        //if(tasks.length === 0) return res.send("Empty")
        //res.send(tasks);
