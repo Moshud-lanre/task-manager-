@@ -21,8 +21,15 @@ router
 
 .get("/tasks", auth,  async (req, res) => {
     const match = {};
+    const sort = {};
+
     if(req.query.completed){
         match.completed = req.query.completed == "true";
+    }
+
+    if(req.query.sortBy){
+        const parts = req.query.sortBy.split(":"); //splits the query into 2 and in an array
+        sort[parts[0]] = parts[1] === "desc" ? -1:1;
     }
 
     try {
@@ -33,7 +40,8 @@ router
            match,
            options: {
                limit: Number(req.query.limit),
-               skip: parseInt(req.query.skip)
+               skip: parseInt(req.query.skip),
+               sort
            }
        }).execPopulate(); //method 2
        //if(tasks.length === 0) return res.send("Empty")
