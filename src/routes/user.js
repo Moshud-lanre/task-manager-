@@ -1,10 +1,13 @@
 const express = require("express");
-const User = require("../models/user");
-const auth = require("../middlware/auth");
-const path = require("path");
-const router = new express.Router();
 const multer = require("multer");
 const sharp = require("sharp");
+const User = require("../models/user");
+const auth = require("../middlware/auth");
+const {sendWelcomeEmail, sendCanceleEmail} = require("../emails/acccount");
+const path = require("path");
+const router = new express.Router();
+
+
 
 const upload = multer({
     // dest: "avatar", set the storage path
@@ -26,6 +29,7 @@ router
     const user = new User(req.body); // express.json parses the content of req.body
     try {
         await user.save();
+        sendWelcomeEmail(user.email, user.name);
         const token = await user.generateAuthToken();
         //res.cookie("auth_token", token);
         res.status(201).send({ user, token});
@@ -124,6 +128,7 @@ router
 .delete("/users/me", auth, async (req, res) => {
     try {
         await req.user.remove();
+        sendCanceleEmail(req.user.email, req.user.name);
         res.send(req.user);
     } catch (e) {
         res.status(500).send(e);
