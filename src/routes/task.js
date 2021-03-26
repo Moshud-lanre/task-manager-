@@ -22,11 +22,11 @@ router
 .get("/tasks", auth,  async (req, res) => {
     const match = {};
     const sort = {};
-
+// filtering
     if(req.query.completed){
         match.completed = req.query.completed == "true";
     }
-
+//Pagination
     if(req.query.sortBy){
         const parts = req.query.sortBy.split(":"); //splits the query into 2 and in an array
         sort[parts[0]] = parts[1] === "desc" ? -1:1;
