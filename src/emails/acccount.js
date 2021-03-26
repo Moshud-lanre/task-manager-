@@ -1,6 +1,5 @@
 const mailgun = require("mailgun-js");
-const DOMAIN = 'sandboxd1ddb8fad74a4c4080f2f0861685f239.mailgun.org';
-const mg = mailgun({apiKey: process.env.API_KEY, domain: DOMAIN});
+const mg = mailgun({apiKey: process.env.API_KEY, domain: process.env.DOMAIN});
 
 const sendWelcomeEmail = (email, name) => {
     const data = {
