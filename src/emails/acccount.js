@@ -15,7 +15,7 @@ const sendWelcomeEmail = (email, name) => {
 
 const sendCanceleEmail = (email, name) => {
     const data = {
-        from: ' Task-App  o.moshud10@gmail.com',
+        from: ' Task-App  lanremoshud10@gmail.com',
         to: email,
         subject: 'Good Bye',
         text: `Sad to see you leave, ${name}. Is there anything you would like to let us know about our service? `
